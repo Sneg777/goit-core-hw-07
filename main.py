@@ -24,9 +24,10 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value):
         try:
-            self.value = datetime.strptime(value, "%d.%m.%Y").date()
+            datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
             raise ValueError("Invalid date format. Please use DD.MM.YYYY.")
+        self.value = value
 
 
 class Record:
@@ -50,7 +51,7 @@ class Record:
             if phone.value == old_phone:
                 self.phones[idx] = Phone(new_phone)
                 return True
-        return False
+        raise ValueError(f"Phone number {old_phone} not found.")
 
     def __str__(self):
         phones = ', '.join(phone.value for phone in self.phones)
