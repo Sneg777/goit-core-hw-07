@@ -24,7 +24,7 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value):
         try:
-            self.value = datetime.strptime(value, "%d.%m.%Y")
+            datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
             raise ValueError("Invalid date format. Please use DD.MM.YYYY.")
         self.value = value
@@ -74,7 +74,8 @@ class AddressBook(UserDict):
         result = []
         for record in self.data.values():
             if record.birthday:
-                birthday_this_year = record.birthday.value.replace(year=today.year)
+                birthday = datetime.strptime(record.birthday.value, "%d.%m.%Y").date()
+                birthday_this_year = birthday.replace(year=today.year)
                 if today <= birthday_this_year <= today + timedelta(days=7):
                     if birthday_this_year.weekday() >= 5:
                         birthday_this_year += timedelta(days=(7 - birthday_this_year.weekday()))
@@ -148,9 +149,9 @@ def add_birthday(args, book: AddressBook):
 def show_birthday(args, book: AddressBook):
     name = args[0]
     record = book.search(name)
-    if record:
-        return f"{name}'s birthday: {record.birthday.value.strftime('%d.%m.%Y')}" if record.birthday else "Birthday not set."
-    return "Contact not found."
+    if record and record.birthday:
+        return f"{name}'s birthday: {record.birthday.value}"
+    return "Birthday not set."
 
 
 @input_error
@@ -204,7 +205,6 @@ def main():
 
         else:
             print("Unknown command. Please try again.")
-
 
 if __name__ == "__main__":
     main()
